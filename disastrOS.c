@@ -49,8 +49,6 @@ void timerHandler(int j, siginfo_t *si, void *old_context) {
 }
 
 void timerInterrupt(){
-  // Prova
-  printf("ciao");
   if (log_file)
     fprintf(log_file, "TIME: %d\tPID: %d\tACTION: %s\n", disastrOS_time, running->pid, "TIMER_OUT");
   ++disastrOS_time;
