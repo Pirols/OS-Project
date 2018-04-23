@@ -18,6 +18,8 @@ static PoolAllocator _pcb_allocator;
 #define PCBPTR_MEMSIZE (sizeof(PCBPtr)+sizeof(int))
 #define PCBPTR_BUFFER_SIZE MAX_NUM_PROCESSES*PCBPTR_MEMSIZE
 
+#define PCBSEM_SIZE (sizeof(SemaphoreList))
+
 static char _pcb_ptr_buffer[PCBPTR_BUFFER_SIZE];
 static PoolAllocator _pcb_ptr_allocator;
 
@@ -55,7 +57,7 @@ PCB* PCB_alloc() {
   pcb->timer=0;
   List_init(&pcb->children);
   pcb->last_sem_fd=0;
-  List_init(&pcb->descriptors);
+  List_init(&pcb->sem_descriptors);
   return pcb;
 }
 

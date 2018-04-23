@@ -3,6 +3,7 @@
 #include "disastrOS_constants.h"
 #include "linked_list.h"
 #include "disastrOS_timer.h"
+#include "disastrOS_semaphore.h"
 
 typedef enum ProcessStatus {Invalid=-1,
 			    Created=0x0,
@@ -39,7 +40,6 @@ typedef struct PCB{
   char stack[STACK_SIZE];
 
   // more stuff to come
-
   
   //the one below is a hack for the syscalls
   //in a real system one needs to use the cpu to pass
