@@ -8,7 +8,6 @@
 
 void internal_semClose(){
   // do stuff :)
-  int ret;
-  ret = PoolAllocator_releaseBlock(&_timer_item_allocator, (void*) item);
+
   
 }

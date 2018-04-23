@@ -2,21 +2,18 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "disastrOS.h"
+#include "disastrOS.c"
 #include "disastrOS_syscalls.h"
 #include "disastrOS_semaphore.h"
 #include "disastrOS_semdescriptor.h"
-#include "pool_allocator.h"
-
-static char _sem_item_buffer[SEM_ITEM_BUFFER_SIZE];
-static Pool_Allocator sem_item_allocator;
 
 void internal_semOpen(){
 	int id=running->syscall_args[0];
   int value=running->syscall_args[1];
 	
 	//ALLOC THE SEMAPHORE
-	Semaphore *sem = SemaphoreList_byId(semaphores_list, id);
-	
+	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
+	//sem->count = value;
 	//CHECK IF SOMETHING WENT WRONG
 	if(!sem){
 		running->syscall_retvalue = DSOS_ESEMOPEN;
@@ -24,7 +21,7 @@ void internal_semOpen(){
 	}
 	
 	//CREATE THE DESCRIPTOR AND CHECK
-	Descriptor *sem_des = Descriptor_alloc(running->last_sem_fd, sem, running);
+	SemDescriptor *sem_des = SemDescriptor_alloc(running->last_sem_fd, sem, running);
 	
 	if(!sem_des){
 		running->syscall_retvalue = DSOS_ESEMFD;
@@ -33,6 +30,17 @@ void internal_semOpen(){
 	
 	//INCREMENT LAST_SEM_FD VALUE
 	running->last_sem_fd++;
+	
+	//ADD IT TO SEM_DESCRIPTORS LIST
+	SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
+	List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
+	
+	//ADD IT TO THE SEMAPHORES LIST
+	sem_des->ptr = sem_des_ptr;
+	List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
+	
+	//RETURN THE FD TO THE RUNNING PROCESS
+	running->syscall_retvalue = sem_des->fd;
 }
 
 
