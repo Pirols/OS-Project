@@ -35,6 +35,8 @@
 #define DSOS_ESEMWAIT -16
 #define DSOS_ESEMPPOST -17
 #define DSOS_ESEMFD -18
+#define DSOS_ESEMNOTFOUND -19
+#define DSOS_ESEMALDEXT -20
 
 //semaphores modes
 #define DSOS_SEM_OPEN_CREAT 0//se c'è già annulla tutto

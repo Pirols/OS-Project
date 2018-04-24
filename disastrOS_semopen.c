@@ -10,15 +10,51 @@ void internal_semOpen(){
 	int id=running->syscall_args[0];
   int value=running->syscall_args[1];
   int mode=running->syscall_args[2];
+  
+  char new_sem = -1;
 	
 	//ALLOC THE SEMAPHORE
 	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
-
-	//CHECK IF SOMETHING WENT WRONG
-	if(!sem){
-		running->syscall_retvalue = DSOS_ESEMOPEN;
-		return;
+	
+	//CHECK MODE ERRORS
+	if(mode == DSOS_SEM_OPEN_CREAT) {
+		if(sem != 0) {
+			running->syscall_retvalue = DSOS_ESEMALREXT);
+			return;
+		}
+		
+		new_sem = 1;
+		
+		sem = SemaphoreAlloc(id, value);
+		if(sem == 0) {
+			running->syscall_retvalue = DSOS_ESEMOPEN;
+			return;
+		}
 	}
+	else if(mode == DSOS_SEM_OPEN_LINK) {
+		if(sem != 0) {
+			running->syscall_retvalue = DSOS_ESEMNOTFOUND;
+			return;
+		}
+		
+		continue;
+	}
+	else if(mode == DSOS_SEM_OPEN_CRTLNK) {
+		if(sem == 0) {
+			new_sem = 1;
+			
+			sem = SemaphoreAlloc(id, value);
+			if(sem == 0) {
+				running->syscall_retvalue = DSOS_ESEMOPEN;
+				return;
+			}
+		}
+		else {
+			new_sem = 0;
+			continue;
+		}
+	}<
+	
 	
 	//CREATE THE DESCRIPTOR AND CHECK
 	SemDescriptor *sem_des = SemDescriptor_alloc(running->last_sem_fd, sem, running);
@@ -32,12 +68,14 @@ void internal_semOpen(){
 	running->last_sem_fd++;
 	
 	//ADD IT TO SEM_DESCRIPTORS LIST
-	SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
-	List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
+	if(new_sem == 1) {
+		SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
+		List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	
 	//ADD IT TO THE SEMAPHORES LIST
-	sem_des->ptr = sem_des_ptr;
-	List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
+		sem_des->ptr = sem_des_ptr;
+		List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
+	}
 	
 	//RETURN THE FD TO THE RUNNING PROCESS
 	running->syscall_retvalue = sem_des->fd;
