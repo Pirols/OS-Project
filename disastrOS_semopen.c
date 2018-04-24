@@ -62,11 +62,11 @@ void internal_semOpen(){
 	running->last_sem_fd++;
 	
 	//ADD IT TO SEM_DESCRIPTORS LIST
-	SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
 	List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	
 	//ADD IT TO THE SEMAPHORES LIST
 	if(new_sem) {
+		SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
 		sem_des->ptr = sem_des_ptr;
 		List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
 	}
