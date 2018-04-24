@@ -36,6 +36,12 @@
 #define DSOS_ESEMPPOST -17
 #define DSOS_ESEMFD -18
 
+//semaphores modes
+#define DSOS_SEM_OPEN_CREAT 0//se c'è già annulla tutto
+#define DSOS_SEM_OPEN_LINK 1 //linka semaforo già esistente
+#define DSOS_SEM_OPEN_REPLACE 2 //elimina quello con vecchio id e ne crea uno nuovo
+#define DSOS_SEM_OPEN_CRTLNK 3 //creat and link
+
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32
 #define DSOS_MAX_SYSCALLS_ARGS 8

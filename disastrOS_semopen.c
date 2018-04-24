@@ -9,10 +9,11 @@
 void internal_semOpen(){
 	int id=running->syscall_args[0];
   int value=running->syscall_args[1];
+  int mode=running->syscall_args[2];
 	
 	//ALLOC THE SEMAPHORE
 	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
-	//sem->count = value;
+
 	//CHECK IF SOMETHING WENT WRONG
 	if(!sem){
 		running->syscall_retvalue = DSOS_ESEMOPEN;
