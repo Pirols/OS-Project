@@ -9,7 +9,7 @@
 void internal_semOpen(){
 	int id=running->syscall_args[0],
 	  	value=running->syscall_args[1],
-		mod=running->syscall_args[2];
+		mode=running->syscall_args[2];
 
 	char new_sem = 1;
 	
@@ -17,7 +17,7 @@ void internal_semOpen(){
 	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
 
 	//CHECK MODE
-	if(mod == DSOS_SEMOPEN_CREATE) {
+	if(mode == DSOS_SEMOPEN_CREATE) {
 		if(sem != 0) {
 			running->syscall_retvalue = DSOS_ESEMALREADYEXIST;
 			return;
@@ -29,7 +29,7 @@ void internal_semOpen(){
 		}
 	}
 	
-	else if(mod == DSOS_SEMOPEN_LINK) {
+	else if(mode == DSOS_SEMOPEN_LINK) {
 		if(sem == 0) {
 			running->syscall_retvalue = DSOS_ESEMNOTFOUND;
 			return;
@@ -37,7 +37,7 @@ void internal_semOpen(){
 		new_sem = 0;
 	}
 
-	else if(mod == DSOS_SEMOPEN_LNKCRT) {
+	else if(mode == DSOS_SEMOPEN_LNKCRT) {
 		if(sem == 0) {
 			sem = Semaphore_alloc(id, value);
 			if(sem == 0) {
