@@ -18,19 +18,19 @@ void internal_semOpen(){
 
 	//CHECK MODE
 	if(mode == DSOS_SEMOPEN_CREATE) {
-		if(sem != 0) {
+		if(sem) {
 			running->syscall_retvalue = DSOS_ESEMALREADYEXIST;
 			return;
 		}
 		sem = Semaphore_alloc(id, value);
-		if(sem == 0) {
+		if(!sem) {
 			running->syscall_retvalue = DSOS_ESEMOPEN;
 			return;
 		}
 	}
 	
 	else if(mode == DSOS_SEMOPEN_LINK) {
-		if(sem == 0) {
+		if(!sem == 0) {
 			running->syscall_retvalue = DSOS_ESEMNOTFOUND;
 			return;
 		}
@@ -38,9 +38,9 @@ void internal_semOpen(){
 	}
 
 	else if(mode == DSOS_SEMOPEN_LNKCRT) {
-		if(sem == 0) {
+		if(!sem) {
 			sem = Semaphore_alloc(id, value);
-			if(sem == 0) {
+			if(!sem) {
 				running->syscall_retvalue = DSOS_ESEMOPEN;
 				return;
 			}
