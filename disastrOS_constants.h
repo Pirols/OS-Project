@@ -35,6 +35,14 @@
 #define DSOS_ESEMWAIT -16
 #define DSOS_ESEMPPOST -17
 #define DSOS_ESEMFD -18
+#define DSOS_ESEMNOTFOUND -19
+#define DSOS_ESEMALREADYEXIST -20
+
+// semaphores 
+#define DSOS_SEMOPEN_CREATE 0               // Tries to create a new semaphore, if the id is already used returns an error
+#define DSOS_SEMOPEN_LINK 1                 // Tries to link to an existing semaphore, if it doesn't exist returns an error
+#define DSOS_SEMOPEN_REPLACE 2              // Tries to create a new semaphore, if the id is already used override the existing semaphore
+#define DSOS_SEMOPEN_LNKCRT 3              // Tries to link to an existing semaphore, if it doesn't exist it creates a new one
 
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32

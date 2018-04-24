@@ -186,7 +186,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
 
   // fill these with the syscall handlers
   syscall_vector[DSOS_CALL_SEMOPEN]      = internal_semOpen;
-  syscall_numarg[DSOS_CALL_SEMOPEN]      = 2; //EDITED DEFAULT 1 -> id nel sistema; 2 -> value; 3 -> mode
+  syscall_numarg[DSOS_CALL_SEMOPEN]      = 3; //EDITED DEFAULT 1 -> id nel sistema; 2 -> value; 3 -> mode
 
   syscall_vector[DSOS_CALL_SEMCLOSE]      = internal_semClose;
   syscall_numarg[DSOS_CALL_SEMCLOSE]      = 1;
@@ -305,6 +305,22 @@ int disastrOS_closeResource(int fd) {
 
 int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
+}
+
+int disastrOS_openSemaphore(int id, int value, int mode) {
+  return disastrOS_syscall(DSOS_CALL_SEMOPEN, id, value, mode);
+}
+
+int disastrOS_closeSemaphore(int id) {
+  return disastrOS_syscall(DSOS_CALL_SEMCLOSE, id);
+}
+
+int disastrOS_waitSemaphore(int id) {
+  return disastrOS_syscall(DSOS_CALL_SEMWAIT, id);
+}
+
+int disastrOS_postSemaphore(int id) {
+  return disastrOS_syscall(DSOS_CALL_SEMPOST, id);
 }
 
 
