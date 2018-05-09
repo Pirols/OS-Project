@@ -4,6 +4,7 @@
 #include "disastrOS.h"
 #include "disastrOS_syscalls.h"
 #include "disastrOS_descriptor.h"
+#include "disastrOS_semdescriptor.h"
 
 // called upon termination
 // moves the process to a zombie status
@@ -79,6 +80,16 @@ void internal_exit(){
       List_detach(&res->descriptors, (ListItem*) des->ptr);
       DescriptorPtr_free(des->ptr);
       Descriptor_free(des);
+    }
+    
+    //we release all semaphors of a process upon termination
+    while(running->sem_descriptors.first) {
+      SemDescriptor* sem_des=(SemDescriptor*) running->sem_descriptors.first;
+      List_detach(&running->sem_descriptors, (ListItem*) sem_des);
+      Semaphore* sem=sem_des->semaphore;
+      List_detach(&sem->descriptors, (ListItem*) sem_des->ptr);
+      SemDescriptorPtr_free(sem_des->ptr);
+      SemDescriptor_free(sem_des);
     }
     
     // the process finally dies

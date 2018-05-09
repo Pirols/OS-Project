@@ -146,6 +146,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
+  SemDescriptor_init();
   Semaphore_init(); //EDITED
   //sem_count=-1; // """
   init_pcb=0;
@@ -186,7 +187,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
 
   // fill these with the syscall handlers
   syscall_vector[DSOS_CALL_SEMOPEN]      = internal_semOpen;
-  syscall_numarg[DSOS_CALL_SEMOPEN]      = 3; //EDITED DEFAULT 1 -> id nel sistema; 2 -> value; 3 -> mode
+  syscall_numarg[DSOS_CALL_SEMOPEN]      = 3;//EDITED DEFAULT 1 -> id nel sistema; 2 -> value; 3 -> mode
 
   syscall_vector[DSOS_CALL_SEMCLOSE]      = internal_semClose;
   syscall_numarg[DSOS_CALL_SEMCLOSE]      = 1;
@@ -306,6 +307,8 @@ int disastrOS_closeResource(int fd) {
 int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
 }
+
+//SEMAPHORES
 
 int disastrOS_openSemaphore(int id, int value, int mode) {
   return disastrOS_syscall(DSOS_CALL_SEMOPEN, id, value, mode);

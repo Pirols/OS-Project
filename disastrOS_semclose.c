@@ -8,6 +8,6 @@
 
 void internal_semClose(){
   // do stuff :)
-
+	int sem_fd = running->syscall_args[0];
   
 }

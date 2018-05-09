@@ -21,6 +21,12 @@ void childFunction(void* args){
   int fd=disastrOS_openResource(disastrOS_getpid(),type,mode);
   printf("fd=%d\n", fd);
   printf("PID: %d, terminating\n", disastrOS_getpid());
+  
+  //EDITED
+  int sem_fd=disastrOS_openSemaphore(disastrOS_getpid(), 1, DSOS_SEMOPEN_CREATE);
+  printf("sem_fd=%d\n", sem_fd);
+  printf("PID: %d, terminating\n", disastrOS_getpid());
+  //
 
   for (int i=0; i<(disastrOS_getpid()+1); ++i){
     printf("PID: %d, iterate %d\n", disastrOS_getpid(), i);
@@ -29,15 +35,16 @@ void childFunction(void* args){
   disastrOS_exit(disastrOS_getpid()+1);
 }
 
-
 void initFunction(void* args) {
   disastrOS_printStatus();
   printf("hello, I am init and I just started\n");
   disastrOS_spawn(sleeperFunction, 0);
-  
 
   printf("I feel like to spawn 10 nice threads\n");
+  
   int alive_children=0;
+  int fd_sem[10];
+  
   for (int i=0; i<10; ++i) {
     int type=0;
     int mode=DSOS_CREATE;
@@ -45,8 +52,21 @@ void initFunction(void* args) {
     printf("opening resource (and creating if necessary)\n");
     int fd=disastrOS_openResource(i,type,mode);
     printf("fd=%d\n", fd);
+    
+    //EDITED
+    fd_sem[i] = disastrOS_openSemaphore(i, 1, DSOS_SEMOPEN_CREATE);
+  	printf("sem_fd=%d\n", fd_sem[i]);
+  	//
+  
     disastrOS_spawn(childFunction, 0);
     alive_children++;
+    
+    int i;
+    int fd_sem[10];
+    for(i = 0; i < 10; i++) {
+    	fd_sem[i] = disastrOS_openSemaphore(i, 1, DSOS_SEMOPEN_CREATE);
+    	printf("fd = %d\n", fd_sem[i]);
+    }
   }
 
   disastrOS_printStatus();
@@ -70,7 +90,7 @@ int main(int argc, char** argv){
   // we create the init process processes
   // the first is in the running variable
   // the others are in the ready queue
-  printf("the function pointer is: %p", childFunction);
+  //printf("the function pointer is: %p", childFunction);
   // spawn an init process
   printf("start\n");
   disastrOS_start(initFunction, 0, logfilename);
