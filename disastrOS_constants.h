@@ -29,7 +29,7 @@
 #define DSOS_ERESOURCECLOSE -12
 #define DSOS_ERESOURCEINUSE -13
 
-//semaphores errors
+// semaphores errors
 #define DSOS_ESEMOPEN -14
 #define DSOS_ESEMCLOSE -15
 #define DSOS_ESEMWAIT -16
