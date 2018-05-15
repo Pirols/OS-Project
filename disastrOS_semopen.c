@@ -17,6 +17,7 @@ void internal_semOpen(){
 	
 	//ALLOC THE SEMAPHORE
 	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
+	int fd = running->last_sem_fd;
 
 	//CHECK MODE
 	if(mode == DSOS_SEMOPEN_CREATE) {
@@ -53,6 +54,14 @@ void internal_semOpen(){
 			new_sem = 1;
 		}
 		else new_sem = 0;
+	} 
+
+
+	sem = Semaphore_alloc(id, value);
+	List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
+	if(!sem) {
+		running->syscall_retvalue = DSOS_ESEMOPEN;
+		return;
 	}
 	
 	//controllo che non sia già aperto NEL PROCESSO 
@@ -83,9 +92,21 @@ void internal_semOpen(){
 			SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
 			sem_des->ptr = sem_des_ptr;
 			List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
-		}
 	
-		//RETURN THE FD TO THE RUNNING PROCESS
-		running->syscall_retvalue = running->last_sem_fd;
+			SemDescriptorPtr *sem_des_ptr_wtr = SemDescriptorPtr_alloc(sem_des);
+			if(!sem_des_ptr_wtr) {
+				running->syscall_retvalue = DSOS_ESEMPTR;
+				return;
+			}
+			sem_des->ptr_wtr = sem_des_ptr_wtr;
+
+			List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
+			List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
+		//
+		}
 	}
+	
+	//RETURN THE FD TO THE RUNNING PROCESS
+	running->syscall_retvalue = fd;
+	return;
 }

@@ -3,6 +3,12 @@
 #include <poll.h>
 
 #include "disastrOS.h"
+#include "disastrOS_constants.h"
+#include "disastrOS_globals.h"
+
+void initFunction(void *args);
+void Producer(void *args);
+void Consumer(void *args);
 
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
@@ -13,26 +19,60 @@ void sleeperFunction(void* args){
   }
 }
 
-void childFunction(void* args){
-  printf("Hello, I am the child function %d\n",disastrOS_getpid());
-  printf("I will iterate a bit, before terminating\n");
-  int type=0;
-  int mode=0;
-  int fd=disastrOS_openResource(disastrOS_getpid(),type,mode);
-  printf("fd=%d\n", fd);
-  printf("PID: %d, terminating\n", disastrOS_getpid());
-  
-  //EDITED
-  int sem_fd=disastrOS_openSemaphore(disastrOS_getpid(), 1, DSOS_SEMOPEN_CREATE);
-  printf("sem_fd=%d\n", sem_fd);
-  printf("PID: %d, terminating\n", disastrOS_getpid());
-  //
+void Producer(void* args){
+  int i;
 
-  for (int i=0; i<(disastrOS_getpid()+1); ++i){
-    printf("PID: %d, iterate %d\n", disastrOS_getpid(), i);
-    disastrOS_sleep((20-disastrOS_getpid())*5);
-  }
-  disastrOS_exit(disastrOS_getpid()+1);
+  printf("Hello, I'm starting a producer with pid: %d\n",disastrOS_getpid());
+
+  int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_CREATE);
+
+  int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_CREATE);
+
+  int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_CREATE);
+
+  for(i=0; i<ROUNDS; ++i) {
+    disastrOS_waitSemaphore(sem_empty);
+    disastrOS_waitSemaphore(sem_mut1);
+
+    //ROBA DA SCRIVERE DOPO
+
+    disastrOS_postSemaphore(sem_mut1);
+    disastrOS_postSemaphore(sem_fill);
+  } 
+
+  disastrOS_closeSemaphore(sem_fill);
+
+  disastrOS_closeSemaphore(sem_empty);
+
+  disastrOS_closeSemaphore(sem_mut1);
+}
+
+void Consumer(void* args){
+  int i;
+
+  printf("Hello, I'm starting a consumer with pid: %d\n",disastrOS_getpid());
+
+  int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_CREATE);
+
+  int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_CREATE);
+
+  int sem_mut2 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_CREATE);
+
+  for(i=0; i<ROUNDS; ++i) {
+    disastrOS_waitSemaphore(sem_fill);
+    disastrOS_waitSemaphore(sem_mut2);
+
+    //ROBA DA SCRIVERE DOPO
+
+    disastrOS_postSemaphore(sem_mut2);
+    disastrOS_postSemaphore(sem_empty);
+  } 
+
+  disastrOS_closeSemaphore(sem_fill);
+
+  disastrOS_closeSemaphore(sem_empty);
+
+  disastrOS_closeSemaphore(sem_mut2);
 }
 
 void initFunction(void* args) {
@@ -40,44 +80,53 @@ void initFunction(void* args) {
   printf("hello, I am init and I just started\n");
   disastrOS_spawn(sleeperFunction, 0);
 
+  int write_index = 0;
+  int read_index = 0;
+
   printf("I feel like to spawn 10 nice threads\n");
   
-  int alive_children=0;
-  int fd_sem[10];
+  int children=0;
+  int fd[10];
+  int i;
   
-  for (int i=0; i<10; ++i) {
+  for (int i=0; i<5; ++i) {
     int type=0;
     int mode=DSOS_CREATE;
     printf("mode: %d\n", mode);
     printf("opening resource (and creating if necessary)\n");
-    int fd=disastrOS_openResource(i,type,mode);
-    printf("fd=%d\n", fd);
-    
-    //EDITED
-    fd_sem[i] = disastrOS_openSemaphore(i, 1, DSOS_SEMOPEN_CREATE);
-  	printf("sem_fd=%d\n", fd_sem[i]);
-  	//
-  
-    disastrOS_spawn(childFunction, 0);
-    alive_children++;
-    
-    int i;
-    int fd_sem[10];
-    for(i = 0; i < 10; i++) {
-    	fd_sem[i] = disastrOS_openSemaphore(i, 1, DSOS_SEMOPEN_CREATE);
-    	printf("fd = %d\n", fd_sem[i]);
-    }
+    fd[i]=disastrOS_openResource(i,type,mode);
+    printf("fd=%d\n", fd[i]);
+    disastrOS_spawn(Producer, 0);
+    children++;
+  }
+
+  for(; i<10; ++i) {
+    int type=0;
+    int mode=DSOS_CREATE;
+    printf("mode: %d\n", mode);
+    printf("opening resource (and creating if necessary)\n");
+    fd[i]=disastrOS_openResource(i,type,mode);
+    printf("fd=%d\n", fd[i]);
+    disastrOS_spawn(Consumer, 0);
+    children++;
+  }
+
+  int retval;
+  int pid;
+  while(children>0 && (pid=disastrOS_wait(0, &retval))>=0){ 
+    printf("initFunction, child: %d terminated, retval:%d, alive: %d \n",
+	   pid, retval, children);
+    --children;
+  }
+
+  for(i=0; i<10; ++i) {
+    printf("closing resource %d\n", fd[i]);
+    disastrOS_closeResource(fd[i]);
+    disastrOS_destroyResource(i);
   }
 
   disastrOS_printStatus();
-  int retval;
-  int pid;
-  while(alive_children>0 && (pid=disastrOS_wait(0, &retval))>=0){ 
-    disastrOS_printStatus();
-    printf("initFunction, child: %d terminated, retval:%d, alive: %d \n",
-	   pid, retval, alive_children);
-    --alive_children;
-  }
+
   printf("shutdown!");
   disastrOS_shutdown();
 }
