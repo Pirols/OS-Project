@@ -13,7 +13,7 @@ void internal_semOpen(){
 	int value=running->syscall_args[1];
 	int mode=running->syscall_args[2];
 
-	char new_sem = -1;
+	char new_sem = 0;
 	
 	//ALLOC THE SEMAPHORE
 	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
@@ -32,6 +32,8 @@ void internal_semOpen(){
 			//List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 			return;
 		}
+
+		new_sem = 1;
 	}
 	else if(mode == DSOS_SEMOPEN_LINK) {
 		if(!sem == 0) {
@@ -47,6 +49,8 @@ void internal_semOpen(){
 				running->syscall_retvalue = DSOS_ESEMOPEN;
 				return;
 			}
+
+			new_sem = 1;
 		}
 		else new_sem = 0;
 	}
