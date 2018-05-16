@@ -42,7 +42,8 @@ void Producer(void* args){
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
-  /*for(i=0; i<ROUNDS; ++i) {
+  for(i=0; i<ROUNDS; ++i) {
+    printf("Faccio la wait\n\n\n");
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut1);
 
@@ -50,7 +51,7 @@ void Producer(void* args){
 
     disastrOS_postSemaphore(sem_mut1);
     disastrOS_postSemaphore(sem_fill);
-  } */
+  } 
 
   ret = disastrOS_closeSemaphore(sem_fill);
   if(ret != 0) {
@@ -140,8 +141,8 @@ void initFunction(void* args) {
   printf("hello, I am init and I just started\n");
   disastrOS_spawn(sleeperFunction, 0);
 
-  int write_index = 0;
-  int read_index = 0;
+  //int write_index = 0;
+  //int read_index = 0;
 
   printf("I feel like to spawn 10 nice threads\n");
   

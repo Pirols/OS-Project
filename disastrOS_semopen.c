@@ -55,14 +55,8 @@ void internal_semOpen(){
 
 			new_sem = 1;
 		}
-<<<<<<< HEAD
-		else new_sem = 1;
-	}
-=======
 		else new_sem = 0;
-	} 
-
->>>>>>> 3416f3e02e7adafb57055745411cfe9f45f977df
+	}
 	
 	//controllo che non sia già aperto NEL PROCESSO 
 	ListHead sem_opened_local = running->sem_descriptors;
@@ -81,14 +75,10 @@ void internal_semOpen(){
 			running->syscall_retvalue = DSOS_ESEMFD;
 			return;
 		}
-<<<<<<< HEAD
 		
 		//ADD IT TO SEM_DESCRIPTORS LIST
 		List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	
-=======
-			
->>>>>>> 3416f3e02e7adafb57055745411cfe9f45f977df
 		//ADD IT TO THE SEMAPHORES LIST
 		if(new_sem) {
 			SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);

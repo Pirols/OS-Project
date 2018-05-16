@@ -30,11 +30,11 @@ void internal_semWait(){
     // Maybe internal_schedule or swapcontext(disastros.c)?
     int pid = running->pid;
     running->status = Waiting;
-    List_insert(&sem->waiting_descriptors, sem->waiting_descriptors.last, pid);
-    List_insert(&waiting_list, waiting_list.last, running);
+    List_insert(&sem->waiting_descriptors, sem->waiting_descriptors.last, (ListItem *)pid);
+    List_insert(&waiting_list, waiting_list.last, (ListItem *)running);
     running = ready_list.first;
     running->status = Running;
-    List_detach(&ready_list, running);
+    List_detach(&ready_list, (ListItem *)running);
 
     running->return_value = 0;
     // TO BE CHECKED! I'm actually changing the ret_value of a process which actually didn't start the syscall!!
