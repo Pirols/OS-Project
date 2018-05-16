@@ -94,7 +94,7 @@ void internal_semOpen(){
 			List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
 
 			//DEBUG CODE:
-			running=(PCB*) List_detach(&ready_list, ready_list.first);
+			//running=(PCB*) List_detach(&ready_list, ready_list.first);
 		}
 	}
 	

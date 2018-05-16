@@ -106,20 +106,32 @@ void Consumer(void* args){
 
   ret = disastrOS_closeSemaphore(sem_fill);
   if(ret != 0) {
+    printf("%d\n", ret);
     printf("[TEST_CONS] error closing sem_fill!\n");
     disastrOS_exit(disastrOS_getpid()+1);
+  }
+  else {
+      printf("CHIUSOOOOO \n");
   }
 
   disastrOS_closeSemaphore(sem_empty);
   if(ret != 0) {
+    printf("%d\n", ret);
     printf("[TEST_CONS] error closing sem_empty!\n");
     disastrOS_exit(disastrOS_getpid()+1);
+  }
+  else {
+      printf("CHIUSOOOOO \n");
   }
 
   disastrOS_closeSemaphore(sem_mut2);
   if(ret != 0) {
+    printf("%d\n", ret);
     printf("[TEST_CONS] error closing sem_mut2!\n");
     disastrOS_exit(disastrOS_getpid()+1);
+  }
+  else {
+    printf("CHIUSOOOOO \n");
   }
 }
 
@@ -137,7 +149,7 @@ void initFunction(void* args) {
   int fd[10];
   int i;
   
-  for (int i=0; i<5; ++i) {
+  for (int i=0; i<10; ++i) {
     int type=0;
     int mode=DSOS_CREATE;
     printf("mode: %d\n", mode);
