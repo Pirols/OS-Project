@@ -9,30 +9,29 @@
 void internal_semPost() {
   int id=running->syscall_args[0];
 
-  Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
-  // Is it enough to look for the semaphore in the global list?
-  // Shall I look to the process' semaphores?
+  SemDescriptor *sem_des = SemDescriptorList_byFd(&(running->sem_descriptors), id);
 
-  if(!sem) {
+  if(!sem_des) {
     running->syscall_retvalue = DSOS_ESEMPOST;
     return;
   }
-  (sem->count)++; 
+  
+  Semaphore *sem = sem_des->semaphore;
 
-  if(sem->count >= 1) {       // There are no processes waiting for this semaphore
-    if(sem->waiting_descriptors.size != 0) running->syscall_retvalue = DSOS_ESEMPOST;
-    else running->syscall_retvalue = 0;
-  }
-
-  else {
+  if(sem->count < 0) {
     // Since count is less than 0 we need to have at least one process in waiting_descriptors list
-    if(sem->waiting_descriptors.size == 0) running->syscall_retvalue = DSOS_ESEMPOST;
-    else {
-      ListItem *first = List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
-      PCB *pcb = PCB_byPID(&waiting_list, first);
-      List_detach(&waiting_list, pcb);
-      List_insert(&ready_list, ready_list.last, pcb);
-      running->syscall_retvalue = 0;
-    }
+    SemDescriptorPtr *new_proc = (SemDescriptorPtr *)List_detach(&sem->waiting_descriptors, (ListItem *)sem->waiting_descriptors.first);
+
+    PCB *new_proc_pcb = new_proc->descriptor->pcb;
+
+    List_detach(&waiting_list, (ListItem *)new_proc_pcb);
+
+    new_proc_pcb->status = Ready;
+
+    List_insert(&ready_list, ready_list.last, (ListItem *)new_proc_pcb);
   }
+
+  (sem->count)++;
+  running->syscall_retvalue = 0;
+  return;
 }

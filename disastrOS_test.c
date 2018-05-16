@@ -6,7 +6,7 @@
 #include "disastrOS_constants.h"
 #include "disastrOS_globals.h"
 
-int read_index, write_index;
+int read_index = 0, write_index = 0, x = 0;
 int action[BUFFER_LENGTH_SEM];
 
 void initFunction(void *args);
@@ -28,62 +28,35 @@ void Producer(void* args){
   printf("Hello, I'm starting a producer with pid: %d\n",disastrOS_getpid());
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
-  if(sem_fill < 0) {
-    printf("[TEST_PROD] error opening sem_fill!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
-
-  printf("aperto fill\n\n");
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
-  if(sem_empty < 0) {
-    printf("[TEST_PROD] error opening sem_empty!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
-
-    printf("aperto empty\n\n");
-
+  if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
 
   int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
-  if(sem_fill < 0) {
-    printf("[TEST_PROD] error opening sem_mut1!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
-
-  printf("semafori aperti prod \n\n\n");
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   for(i=0; i<ROUNDS; ++i) {
-    printf("Faccio la wait, %d\n\n\n", i);
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut1);
 
-    //ROBA DA SCRIVERE DOPO
     printf("I'm the producer and I'm in the critical section!\n");
     action[write_index] = running->pid;
     write_index = (write_index + 1) % BUFFER_LENGTH_SEM;
 
-    printf("faccio la post\n\n");
     disastrOS_postSemaphore(sem_mut1);
     disastrOS_postSemaphore(sem_fill);
   } 
 
   ret = disastrOS_closeSemaphore(sem_fill);
-  if(ret != 0) {
-    printf("[TEST_PROD] error closing sem_fill!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
 
-  ret = disastrOS_closeSemaphore(sem_empty);
-  if(ret != 0) {
-    printf("[TEST_PROD] error closing sem_empty!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
+  ret = disastrOS_closeSemaphore(sem_empty);  disastrOS_printStatus();
+
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   ret = disastrOS_closeSemaphore(sem_mut1);
-  if(ret != 0) {
-    printf("[TEST_PROD] error closing sem_empty!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
@@ -94,71 +67,44 @@ void Consumer(void* args){
   printf("Hello, I'm starting a consumer with pid: %d\n",disastrOS_getpid());
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
-  if(sem_fill < 0) {
-    printf("[TEST_CONS] error opening sem_fill!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
-  if(sem_empty < 0) {
-    printf("[TEST_CONS] error opening sem_empty!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
+  if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
 
   int sem_mut2 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
-  if(sem_mut2 < 0) {
-    printf("[TEST_CONS] error opening sem_mut2!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
+  if(sem_mut2 < 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   for(i=0; i<ROUNDS; ++i) {
     disastrOS_waitSemaphore(sem_fill);
     disastrOS_waitSemaphore(sem_mut2);
 
-    //ROBA DA SCRIVERE DOPO
+    printf("Hello,i am the cons and i am in CS! Pid : %d\n",running->pid);
+    int lastTransaction = action[read_index];
+    read_index = (read_index + 1) % BUFFER_LENGTH_SEM;
+    x += lastTransaction;
+    if (read_index % 10 == 0) {
+    printf("After the last 10 action balance is now %d.\n", x);
+}
 
     disastrOS_postSemaphore(sem_mut2);
     disastrOS_postSemaphore(sem_empty);
   } 
 
   ret = disastrOS_closeSemaphore(sem_fill);
-  if(ret != 0) {
-    printf("%d\n", ret);
-    printf("[TEST_CONS] error closing sem_fill!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
-  else {
-      printf("CHIUSOOOOO \n");
-  }
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   disastrOS_closeSemaphore(sem_empty);
-  if(ret != 0) {
-    printf("%d\n", ret);
-    printf("[TEST_CONS] error closing sem_empty!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
-  else {
-      printf("CHIUSOOOOO \n");
-  }
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
 
   disastrOS_closeSemaphore(sem_mut2);
-  if(ret != 0) {
-    printf("%d\n", ret);
-    printf("[TEST_CONS] error closing sem_mut2!\n");
-    disastrOS_exit(disastrOS_getpid()+1);
-  }
-  else {
-    printf("CHIUSOOOOO \n");
-  }
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
 }
 
 void initFunction(void* args) {
   disastrOS_printStatus();
   printf("hello, I am init and I just started\n");
   disastrOS_spawn(sleeperFunction, 0);
-
-  //int write_index = 0;
-  //int read_index = 0;
 
   printf("I feel like to spawn 10 nice threads\n");
   
@@ -174,6 +120,7 @@ void initFunction(void* args) {
     fd[i]=disastrOS_openResource(i,type,mode);
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
+    disastrOS_printStatus();
     children++;
   }
 

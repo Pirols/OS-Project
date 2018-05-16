@@ -38,6 +38,7 @@
 #define DSOS_ESEMNOTFOUND -19
 #define DSOS_ESEMALREADYEXIST -20
 #define DSOS_ESEMPTR -21
+#define DSOS_ESEMFDNOTFOUND -22
 
 // semaphores 
 #define DSOS_SEMOPEN_CREATE 0               // Tries to create a new semaphore, if the id is already used returns an error
