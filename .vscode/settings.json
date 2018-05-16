@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "disastros_semaphore.h": "c",
+        "linked_list.h": "c"
+    }
+}

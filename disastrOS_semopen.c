@@ -13,7 +13,7 @@ void internal_semOpen(){
 	int value=running->syscall_args[1];
 	int mode=running->syscall_args[2];
 
-	char new_sem = -1;
+	char new_sem = 0;
 	
 	//ALLOC THE SEMAPHORE
 	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
@@ -29,16 +29,15 @@ void internal_semOpen(){
 		List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 		if(!sem) {
 			running->syscall_retvalue = DSOS_ESEMOPEN;
-			//List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 			return;
 		}
 	}
 	else if(mode == DSOS_SEMOPEN_LINK) {
-		if(!sem == 0) {
+		if(!sem) {
 			running->syscall_retvalue = DSOS_ESEMNOTFOUND;
 			return;
 		}
-		new_sem = 0;
+		new_sem = 1;
 	}
 	else if(mode == DSOS_SEMOPEN_LNKCRT) {
 		if(!sem) {
@@ -48,7 +47,7 @@ void internal_semOpen(){
 				return;
 			}
 		}
-		else new_sem = 0;
+		else new_sem = 1;
 	}
 	
 	//controllo che non sia già aperto NEL PROCESSO 
@@ -68,9 +67,7 @@ void internal_semOpen(){
 			running->syscall_retvalue = DSOS_ESEMFD;
 			return;
 		}
-	
-		//INCREMENT LAST_SEM_FD VALUE
-	
+		
 		//ADD IT TO SEM_DESCRIPTORS LIST
 		List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	

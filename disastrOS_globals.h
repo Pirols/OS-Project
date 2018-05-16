@@ -3,7 +3,6 @@
 
 /*
   Global variables used by disastrOS
-
 */
 
 extern PCB* init_pcb; // pcb of the init process
