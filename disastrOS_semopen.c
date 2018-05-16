@@ -62,6 +62,7 @@ void internal_semOpen(){
 	ListHead sem_opened_local = running->sem_descriptors;
 	SemDescriptor *check = SemDescriptorFind_byID(&sem_opened_local, id);
 	if(check) {
+		printf("[SEMOPEN] trovato sem già esistente\n\n");
 		running->syscall_retvalue = check->fd;
 		return;
 	}
@@ -69,7 +70,7 @@ void internal_semOpen(){
 		//CREATE THE DESCRIPTOR AND CHECK
 		//we have to create the semdescriptor
 		(running->last_sem_fd)++;
-		int fd = running->last_sem_fd;
+
 		SemDescriptor* sem_des = SemDescriptor_alloc(fd, sem, running);
 		if(!sem_des){
 			running->syscall_retvalue = DSOS_ESEMFD;
@@ -77,7 +78,7 @@ void internal_semOpen(){
 		}
 		
 		//ADD IT TO SEM_DESCRIPTORS LIST
-		List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
+		//List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	
 		//ADD IT TO THE SEMAPHORES LIST
 		if(new_sem) {
