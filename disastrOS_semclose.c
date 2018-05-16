@@ -6,8 +6,8 @@
 #include "disastrOS_semaphore.h"
 #include "disastrOS_semdescriptor.h"
 
-void internal_semClose(){
-  // do stuff :)
+void internal_semClose() {
+  
 	int sem_fd = running->syscall_args[0];
   int ret;
   

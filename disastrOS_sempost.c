@@ -6,7 +6,7 @@
 #include "disastrOS_semaphore.h"
 #include "disastrOS_semdescriptor.h"
 
-void internal_semPost(){
+void internal_semPost() {
   int id=running->syscall_args[0];
 
   Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
@@ -28,25 +28,11 @@ void internal_semPost(){
     // Since count is less than 0 we need to have at least one process in waiting_descriptors list
     if(sem->waiting_descriptors.size == 0) running->syscall_retvalue = DSOS_ESEMPOST;
     else {
-      ListItem *descriptor = sem->waiting_descriptors.first;
-      /*List_detach(&sem->waiting_descriptors, first);
-      List_detach(&waiting_list, first);
-      List_insert(&ready_list, ready_list.last, first);*/
-
-
-
-
+      ListItem *first = List_detach(&sem->waiting_descriptors, sem->waiting_descriptors.first);
+      PCB *pcb = PCB_byPID(&waiting_list, first);
+      List_detach(&waiting_list, pcb);
+      List_insert(&ready_list, ready_list.last, pcb);
       running->syscall_retvalue = 0;
     }
   }
 }
-
-
-/*typedef struct {
-  ListItem list;
-  int id;
-  int count; // counter for semaphore
-  ListHead descriptors;
-  // this is the list of descriptors that wait
-  ListHead waiting_descriptors;
-} Semaphore;*/
