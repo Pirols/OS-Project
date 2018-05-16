@@ -40,13 +40,3 @@ void internal_semPost(){
     }
   }
 }
-
-
-/*typedef struct {
-  ListItem list;
-  int id;
-  int count; // counter for semaphore
-  ListHead descriptors;
-  // this is the list of descriptors that wait
-  ListHead waiting_descriptors;
-} Semaphore;*/
