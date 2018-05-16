@@ -9,6 +9,7 @@
 void internal_semClose(){
   // do stuff :)
 	int sem_fd = running->syscall_args[0];
+  int ret;
   
   SemDescriptor *sem_des = SemDescriptorList_byFd(&running->sem_descriptors, sem_fd);
   if(!sem_des) {
@@ -16,14 +17,40 @@ void internal_semClose(){
     return;
   }
 
-  sem_des = (SemDescriptor *)List_detach(&running->sem_descriptors, (ListItem *)sem_des);
-  assert(sem_des);
-
   Semaphore *sem = sem_des->semaphore;
 
-  SemDescriptorPtr *sem_des_ptr = (SemDescriptorPtr *)List_detach(&sem->descriptors, (ListItem *)sem_des);
-  assert(sem_des_ptr);
-  SemDescriptor_free(sem_des);
-  SemDescriptorPtr_free(sem_des_ptr);
+  List_detach(&sem->descriptors, (ListItem *)sem_des->ptr);
+
+  if(!(sem->descriptors).size) {
+    sem = (Semaphore *)List_detach(&semaphores_list, (ListItem *)sem);
+    ret = Semaphore_free(sem);
+    if(ret != 0) {
+      running->syscall_retvalue = DSOS_ESEMCLOSE;
+      return;
+    }
+  }
+
+  SemDescriptorPtr *sem_des_ptr = sem_des->ptr;
+  SemDescriptorPtr *sem_des_ptr_wtr = sem_des->ptr_wtr;
+
+  ret = SemDescriptor_free(sem_des);
+  if(ret != 0) {
+    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    return;
+  }
+
+  ret = SemDescriptorPtr_free(sem_des_ptr);
+  if(ret != 0) {
+    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    return;
+  }
+
+  ret = SemDescriptorPtr_free(sem_des_ptr_wtr);
+  if(ret != 0) {
+    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    return;
+  }
+
   running->syscall_retvalue = 0;
+  return;
 }

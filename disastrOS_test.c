@@ -24,25 +24,25 @@ void Producer(void* args){
 
   printf("Hello, I'm starting a producer with pid: %d\n",disastrOS_getpid());
 
-  int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_CREATE);
+  int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0) {
-    printf("[TEST] error opening sem_fill!\n");
+    printf("[TEST_PROD] error opening sem_fill!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
-  int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_CREATE);
+  int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
   if(sem_empty < 0) {
-    printf("[TEST] error opening sem_empty!\n");
+    printf("[TEST_PROD] error opening sem_empty!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
-  int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_CREATE);
+  int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0) {
-    printf("[TEST] error opening sem_mut1!\n");
+    printf("[TEST_PROD] error opening sem_mut1!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
-  for(i=0; i<ROUNDS; ++i) {
+  /*for(i=0; i<ROUNDS; ++i) {
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut1);
 
@@ -50,23 +50,23 @@ void Producer(void* args){
 
     disastrOS_postSemaphore(sem_mut1);
     disastrOS_postSemaphore(sem_fill);
-  } 
+  } */
 
   ret = disastrOS_closeSemaphore(sem_fill);
   if(ret != 0) {
-    printf("[TEST] error closing sem_fill!\n");
+    printf("[TEST_PROD] error closing sem_fill!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
   disastrOS_closeSemaphore(sem_empty);
   if(ret != 0) {
-    printf("[TEST] error closing sem_empty!\n");
+    printf("[TEST_PROD] error closing sem_empty!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
   disastrOS_closeSemaphore(sem_mut1);
   if(ret != 0) {
-    printf("[TEST] error closing sem_mut1!\n");
+    printf("[TEST_PROD] error closing sem_mut1!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 }
@@ -76,21 +76,21 @@ void Consumer(void* args){
 
   printf("Hello, I'm starting a consumer with pid: %d\n",disastrOS_getpid());
 
-  int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_CREATE);
+  int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0) {
-    printf("[TEST] error opening sem_fill!\n");
+    printf("[TEST_CONS] error opening sem_fill!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
-  int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_CREATE);
+  int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
   if(sem_empty < 0) {
-    printf("[TEST] error opening sem_empty!\n");
+    printf("[TEST_CONS] error opening sem_empty!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
-  int sem_mut2 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_CREATE);
+  int sem_mut2 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
   if(sem_mut2 < 0) {
-    printf("[TEST] error opening sem_mut2!\n");
+    printf("[TEST_CONS] error opening sem_mut2!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
@@ -106,19 +106,19 @@ void Consumer(void* args){
 
   ret = disastrOS_closeSemaphore(sem_fill);
   if(ret != 0) {
-    printf("[TEST] error closing sem_fill!\n");
+    printf("[TEST_CONS] error closing sem_fill!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
   disastrOS_closeSemaphore(sem_empty);
   if(ret != 0) {
-    printf("[TEST] error closing sem_empty!\n");
+    printf("[TEST_CONS] error closing sem_empty!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 
   disastrOS_closeSemaphore(sem_mut2);
   if(ret != 0) {
-    printf("[TEST] error closing sem_mut2!\n");
+    printf("[TEST_CONS] error closing sem_mut2!\n");
     disastrOS_exit(disastrOS_getpid()+1);
   }
 }
@@ -175,7 +175,7 @@ void initFunction(void* args) {
 
   disastrOS_printStatus();
 
-  printf("shutdown!");
+  printf("shutdown!\n");
   disastrOS_shutdown();
 }
 

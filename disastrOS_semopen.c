@@ -27,12 +27,12 @@ void internal_semOpen(){
 		}
 		
 		sem = Semaphore_alloc(id, value);
-		List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 		if(!sem) {
 			running->syscall_retvalue = DSOS_ESEMOPEN;
-			//List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 			return;
 		}
+
+		List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 
 		new_sem = 1;
 	}
@@ -51,18 +51,13 @@ void internal_semOpen(){
 				return;
 			}
 
+			List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
+
 			new_sem = 1;
 		}
 		else new_sem = 0;
 	} 
 
-
-	sem = Semaphore_alloc(id, value);
-	List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
-	if(!sem) {
-		running->syscall_retvalue = DSOS_ESEMOPEN;
-		return;
-	}
 	
 	//controllo che non sia già aperto NEL PROCESSO 
 	ListHead sem_opened_local = running->sem_descriptors;
@@ -81,12 +76,7 @@ void internal_semOpen(){
 			running->syscall_retvalue = DSOS_ESEMFD;
 			return;
 		}
-	
-		//INCREMENT LAST_SEM_FD VALUE
-	
-		//ADD IT TO SEM_DESCRIPTORS LIST
-		List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
-	
+			
 		//ADD IT TO THE SEMAPHORES LIST
 		if(new_sem) {
 			SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
@@ -102,7 +92,9 @@ void internal_semOpen(){
 
 			List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 			List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
-		//
+
+			//DEBUG CODE:
+			running=(PCB*) List_detach(&ready_list, ready_list.first);
 		}
 	}
 	
