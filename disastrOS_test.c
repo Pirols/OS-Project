@@ -40,7 +40,7 @@ void Producer(void* args){
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut1);
 
-    printf("I'm the producer and I'm in the critical section!\n");
+    printf("I'm the producer and I'm in the critical section! Pid : %d\n",running->pid);
     action[write_index] = running->pid;
     write_index = (write_index + 1) % BUFFER_LENGTH_SEM;
 
@@ -79,7 +79,7 @@ void Consumer(void* args){
     disastrOS_waitSemaphore(sem_fill);
     disastrOS_waitSemaphore(sem_mut2);
 
-    printf("Hello,i am the cons and i am in CS! Pid : %d\n",running->pid);
+    printf("I'm the producer and I'm in the critical section! Pid : %d\n",running->pid);
     int lastTransaction = action[read_index];
     read_index = (read_index + 1) % BUFFER_LENGTH_SEM;
     x += lastTransaction;
@@ -120,6 +120,8 @@ void initFunction(void* args) {
     fd[i]=disastrOS_openResource(i,type,mode);
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
+
+    
     disastrOS_printStatus();
     children++;
   }
