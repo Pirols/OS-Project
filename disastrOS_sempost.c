@@ -9,7 +9,7 @@
 void internal_semPost() {
   int id=running->syscall_args[0];
 
-  SemDescriptor *sem_des = SemDescriptorList_byId(&(running->sem_descriptors), id);
+  SemDescriptor *sem_des = SemDescriptorFind_byID(&(running->sem_descriptors), id);
 
   if(!sem_des) {
     running->syscall_retvalue = DSOS_ESEMPOST;
