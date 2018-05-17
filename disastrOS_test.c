@@ -114,12 +114,12 @@ void initFunction(void* args) {
   
   for (int i=0; i<10; ++i) {
     int type=0;
-    printf("mode: DSOS_CREATE");
-    printf("opening resource (and creating if necessary)\n");
+    printf("mode: DSOS_CREATE\n");
+    printf("opening resources (and creating if necessary)\n");
     fd[i]=disastrOS_openResource(i, type, DSOS_CREATE);
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
-
+    printf("Created %d threads", i+1);
     disastrOS_printStatus();
     children++;
   }
