@@ -2,3 +2,5 @@
 .o
 .so
 
+disastrOS_test
+libdisastrOS.a

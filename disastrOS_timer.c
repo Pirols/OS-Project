@@ -86,5 +86,5 @@ void TimerList_print(ListHead* timers) {
     if (aux)
       printf(", ");
   }
-  printf("]");
+  printf("]\n");
 }

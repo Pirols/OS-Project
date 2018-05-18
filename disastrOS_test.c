@@ -119,10 +119,9 @@ void initFunction(void* args) {
   
   for (int i=0; i<10; ++i) {
     int type=0;
-    int mode=DSOS_CREATE;
-    printf("mode: %d\n", mode);
-    printf("opening resource (and creating if necessary)\n");
-    fd[i]=disastrOS_openResource(i,type,mode);
+    printf("mode: DSOS_CREATE\n");
+    printf("opening resources (and creating if necessary)\n");
+    fd[i]=disastrOS_openResource(i, type, DSOS_CREATE);
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
     children++;
@@ -130,10 +129,9 @@ void initFunction(void* args) {
 
   for(; i<10; ++i) {
     int type=0;
-    int mode=DSOS_CREATE;
-    printf("mode: %d\n", mode);
+    printf("mode: DSOS_CREATE");
     printf("opening resource (and creating if necessary)\n");
-    fd[i]=disastrOS_openResource(i,type,mode);
+    fd[i]=disastrOS_openResource(i, type, DSOS_CREATE);
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Consumer, 0);
     children++;
@@ -170,7 +168,6 @@ int main(int argc, char** argv){
   // the others are in the ready queue
   //printf("the function pointer is: %p", childFunction);
   // spawn an init process
-  printf("start\n");
   disastrOS_start(initFunction, 0, logfilename);
   return 0;
 }

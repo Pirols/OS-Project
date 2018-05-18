@@ -328,12 +328,12 @@ int disastrOS_postSemaphore(int id) {
 
 
 void disastrOS_printStatus(){
-  printf("****************** DisastrOS ******************\n");
+  printf("\n****************** DisastrOS ******************\n");
   printf("Running: ");
   if (running)
     PCB_print(running);
   printf("\n");
-  printf("Timers: ");
+  printf("\nTimers: ");
   TimerList_print(&timer_list);
   printf("\nResources: ");
   ResourceList_print(&resources_list);
