@@ -117,17 +117,20 @@ void initFunction(void* args) {
   int fd[10];
   int i;
   
-  for (int i=0; i<10; ++i) {
+  for (i=0; i<10; ++i) {
     int type=0;
     printf("mode: DSOS_CREATE\n");
     printf("opening resources (and creating if necessary)\n");
     fd[i]=disastrOS_openResource(i, type, DSOS_CREATE);
     printf("fd=%d\n", fd[i]);
-    disastrOS_spawn(Producer, 0);
+    if(i % 2 == 0)
+      disastrOS_spawn(Producer, 0);
+    else
+      disastrOS_spawn(Consumer, 0);
     children++;
   }
 
-  for(; i<10; ++i) {
+  /*for(i = 0; i<3; ++i) {
     int type=0;
     printf("mode: DSOS_CREATE");
     printf("opening resource (and creating if necessary)\n");
@@ -135,7 +138,7 @@ void initFunction(void* args) {
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Consumer, 0);
     children++;
-  }
+  }*/
 
   int retval;
   int pid;

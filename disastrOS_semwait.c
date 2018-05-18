@@ -39,7 +39,7 @@ void internal_semWait() {
     }
     else running = 0;
   }
-  
+
   running->syscall_retvalue = 0;
   // TO BE CHECKED! I'm actually changing the ret_value of a process which actually didn't start the syscall!!
 
