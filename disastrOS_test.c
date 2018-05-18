@@ -3,6 +3,7 @@
 #include <poll.h>
 
 #include "disastrOS.h"
+#include "semaphore.h"
 #include "disastrOS_constants.h"
 #include "disastrOS_globals.h"
 
@@ -29,12 +30,15 @@ void Producer(void* args){
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_fill opened with fd: %d\n", sem_fill);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
   if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_empty opened with fd: %d\n", sem_empty);
 
   int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_mut1 opened with fd: %d\n", sem_mut1);
 
   for(i=0; i<ROUNDS; ++i) {
     disastrOS_waitSemaphore(sem_empty);
@@ -62,6 +66,7 @@ void Producer(void* args){
 }
 
 void Consumer(void* args){
+
   int i, ret;
 
   printf("Hello, I'm starting a consumer with pid: %d\n",disastrOS_getpid());
@@ -79,13 +84,13 @@ void Consumer(void* args){
     disastrOS_waitSemaphore(sem_fill);
     disastrOS_waitSemaphore(sem_mut2);
 
-    printf("I'm the producer and I'm in the critical section! Pid : %d\n",running->pid);
+    printf("I'm the consumer and I'm in the critical section! Pid : %d\n",running->pid);
     int lastTransaction = action[read_index];
     read_index = (read_index + 1) % BUFFER_LENGTH_SEM;
     x += lastTransaction;
     if (read_index % 10 == 0) {
     printf("After the last 10 action balance is now %d.\n", x);
-}
+    }
 
     disastrOS_postSemaphore(sem_mut2);
     disastrOS_postSemaphore(sem_empty);
@@ -120,9 +125,6 @@ void initFunction(void* args) {
     fd[i]=disastrOS_openResource(i,type,mode);
     printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
-
-    
-    disastrOS_printStatus();
     children++;
   }
 
@@ -149,6 +151,7 @@ void initFunction(void* args) {
     printf("closing resource %d\n", fd[i]);
     disastrOS_closeResource(fd[i]);
     disastrOS_destroyResource(i);
+    printf("reource %d closed\n", fd[i]);
   }
 
   disastrOS_printStatus();
