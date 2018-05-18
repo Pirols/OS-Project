@@ -26,25 +26,25 @@ void sleeperFunction(void* args){
 void Producer(void* args){
   int i, ret;
 
-  printf("Hello, I'm starting a producer with pid: %d\n",disastrOS_getpid());
+  printf("[Prod %d]Hello, I'm starting a producer with pid: %d\n", disastrOS_getpid(), disastrOS_getpid());
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("sem_fill opened with fd: %d\n", sem_fill);
+  else printf("[Prod %d]sem_fill opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
   if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
-  else printf("sem_empty opened with fd: %d\n", sem_empty);
+  else printf("[Prod %d]sem_empty opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
   int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("sem_mut1 opened with fd: %d\n", sem_mut1);
+  else printf("[Prod %d]sem_mut1 opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
-  for(i=0; i<ROUNDS; ++i) {
+  while(1) {
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut1);
 
-    printf("I'm the producer and I'm in the critical section! Pid : %d\n",running->pid);
+    printf("[Prod %d]I'm the producer and I'm in the critical section! Pid : %d\n", disastrOS_getpid(), running->pid);
     action[write_index] = running->pid;
     write_index = (write_index + 1) % BUFFER_LENGTH_SEM;
 
@@ -69,27 +69,30 @@ void Consumer(void* args){
 
   int i, ret;
 
-  printf("Hello, I'm starting a consumer with pid: %d\n",disastrOS_getpid());
+  printf("[Cons %d]Hello, I'm starting a consumer with pid: %d\n", disastrOS_getpid(), disastrOS_getpid());
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Cons %d]sem_fill opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
-  if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Cons %d]sem_empty opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
   int sem_mut2 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
-  if(sem_mut2 < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Cons %d]sem_mut2 opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
-  for(i=0; i<ROUNDS; ++i) {
+  while(1) {
     disastrOS_waitSemaphore(sem_fill);
     disastrOS_waitSemaphore(sem_mut2);
 
-    printf("I'm the consumer and I'm in the critical section! Pid : %d\n",running->pid);
+    printf("[Cons %d]I'm the consumer and I'm in the critical section! Pid : %d\n", disastrOS_getpid(), running->pid);
     int lastTransaction = action[read_index];
     read_index = (read_index + 1) % BUFFER_LENGTH_SEM;
     x += lastTransaction;
     if (read_index % 10 == 0) {
-    printf("After the last 10 action balance is now %d.\n", x);
+      printf("[Cons %d]After the last 10 action balance is now %d.\n", disastrOS_getpid(), x);
     }
 
     disastrOS_postSemaphore(sem_mut2);
@@ -117,22 +120,20 @@ void initFunction(void* args) {
   int fd[10];
   int i;
   
-  for (int i=0; i<10; ++i) {
+  for (int i=0; i<1; ++i) {
     int type=0;
-    printf("mode: DSOS_CREATE\n");
-    printf("opening resources (and creating if necessary)\n");
+    // printf("opening resources (and creating if necessary)\n");
     fd[i]=disastrOS_openResource(i, type, DSOS_CREATE);
-    printf("fd=%d\n", fd[i]);
+    // printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
     children++;
   }
 
-  for(; i<10; ++i) {
+  for(; i<1; ++i) {
     int type=0;
-    printf("mode: DSOS_CREATE");
-    printf("opening resource (and creating if necessary)\n");
+    // printf("opening resource (and creating if necessary)\n");
     fd[i]=disastrOS_openResource(i, type, DSOS_CREATE);
-    printf("fd=%d\n", fd[i]);
+    // printf("fd=%d\n", fd[i]);
     disastrOS_spawn(Consumer, 0);
     children++;
   }
