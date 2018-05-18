@@ -7,6 +7,7 @@
 #include "disastrOS_semdescriptor.h"
 
 void internal_semPost() {
+  
   int id=running->syscall_args[0];
 
   SemDescriptor *sem_des = SemDescriptorFind_byID(&(running->sem_descriptors), id);
@@ -19,7 +20,7 @@ void internal_semPost() {
   Semaphore *sem = sem_des->semaphore;
 
   if(sem->count < 0) {
-    // Since count is less than 0 we need to have at least one process in waiting_descriptors list
+    
     SemDescriptorPtr *new_proc = (SemDescriptorPtr *)List_detach(&sem->waiting_descriptors, (ListItem *)sem->waiting_descriptors.first);
 
     PCB *new_proc_pcb = new_proc->descriptor->pcb;
