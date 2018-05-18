@@ -2,6 +2,9 @@
     "files.associations": {
         "disastros_semaphore.h": "c",
         "linked_list.h": "c",
-        "disastros_semdescriptor.h": "c"
+        "disastros_semdescriptor.h": "c",
+        "disastros.h": "c",
+        "disastros_constants.h": "c",
+        "disastros_globals.h": "c"
     }
 }

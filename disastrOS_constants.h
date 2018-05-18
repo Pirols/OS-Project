@@ -53,7 +53,7 @@
 #define SEM_MUTEX1 2
 #define SEM_MUTEX2 3
 #define BUFFER_LENGTH_SEM 5
-#define ROUNDS 10
+#define ROUNDS 100
 
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32

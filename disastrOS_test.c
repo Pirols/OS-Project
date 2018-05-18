@@ -40,7 +40,7 @@ void Producer(void* args){
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
   else printf("[Prod %d]sem_mut1 opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
-  while(1) {
+  for(i = 0; i < ROUNDS; i++) {
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut1);
 
@@ -83,7 +83,7 @@ void Consumer(void* args){
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
   else printf("[Cons %d]sem_mut2 opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
-  while(1) {
+  for(i = 0; i < ROUNDS; i++) {
     disastrOS_waitSemaphore(sem_fill);
     disastrOS_waitSemaphore(sem_mut2);
 
