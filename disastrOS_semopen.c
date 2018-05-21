@@ -13,10 +13,10 @@ void internal_semOpen(){
 	int value=running->syscall_args[1];
 	int mode=running->syscall_args[2];
 
-	char new_sem = 0;
 	
 	//ALLOC THE SEMAPHORE
-	Semaphore *sem = SemaphoreList_byId(&semaphores_list, id);
+	ListHead semaphores_used = semaphores_list;
+	Semaphore *sem = SemaphoreList_byId(&semaphores_used, id);
 	int fd = running->last_sem_fd;
 
 	//CHECK MODE
@@ -33,15 +33,12 @@ void internal_semOpen(){
 		}
 
 		List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
-
-		new_sem = 1;
 	}
 	else if(mode == DSOS_SEMOPEN_LINK) {
 		if(!sem) {
 			running->syscall_retvalue = DSOS_ESEMNOTFOUND;
 			return;
 		}
-		new_sem = 1;
 	}
 	else if(mode == DSOS_SEMOPEN_LNKCRT) {
 		if(!sem) {
@@ -52,17 +49,13 @@ void internal_semOpen(){
 			}
 
 			List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
-
-			new_sem = 1;
 		}
-		else new_sem = 0;
 	}
 	
 	//controllo che non sia già aperto NEL PROCESSO 
 	ListHead sem_opened_local = running->sem_descriptors;
 	SemDescriptor *check = SemDescriptorFind_byID(&sem_opened_local, id);
 	if(check) {
-		printf("[SEMOPEN] trovato sem già esistente\n\n");
 		running->syscall_retvalue = check->fd;
 		return;
 	}
@@ -81,27 +74,22 @@ void internal_semOpen(){
 		//List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	
 		//ADD IT TO THE SEMAPHORES LIST
-		if(new_sem) {
-			SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
-			sem_des->ptr = sem_des_ptr;
-			List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
+		//if(new_sem) {
+		SemDescriptorPtr *sem_des_ptr = SemDescriptorPtr_alloc(sem_des);
+		sem_des->ptr = sem_des_ptr;
+		List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
 	
-			SemDescriptorPtr *sem_des_ptr_wtr = SemDescriptorPtr_alloc(sem_des);
-			if(!sem_des_ptr_wtr) {
-				running->syscall_retvalue = DSOS_ESEMPTR;
-				return;
-			}
-			sem_des->ptr_wtr = sem_des_ptr_wtr;
-
-			List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
-			List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
-
-			//DEBUG CODE:
-			//running=(PCB*) List_detach(&ready_list, ready_list.first);
+		SemDescriptorPtr *sem_des_ptr_wtr = SemDescriptorPtr_alloc(sem_des);
+		if(!sem_des_ptr_wtr) {
+			running->syscall_retvalue = DSOS_ESEMPTR;
+			return;
 		}
+		sem_des->ptr_wtr = sem_des_ptr_wtr;
+
+		List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
+		List_insert(&sem->descriptors, sem->descriptors.last, (ListItem *)sem_des_ptr);
+			
+		//RETURN THE FD TO THE RUNNING PROCESS
+		running->syscall_retvalue = fd;
 	}
-	
-	//RETURN THE FD TO THE RUNNING PROCESS
-	running->syscall_retvalue = fd;
-	return;
 }

@@ -5,6 +5,7 @@
 #include "disastrOS_syscalls.h"
 #include "disastrOS_semaphore.h"
 #include "disastrOS_semdescriptor.h"
+#include "pool_allocator.h"
 
 void internal_semClose() {
   
@@ -21,14 +22,14 @@ void internal_semClose() {
 
   List_detach(&(sem->descriptors), (ListItem *)sem_des->ptr);
 
-  if(!(sem->descriptors).size) {
-    sem = (Semaphore *)List_detach(&semaphores_list, (ListItem *)sem);
-    ret = Semaphore_free(sem);
-
-    if(ret != 0x0) {
-      running->syscall_retvalue = DSOS_ESEMCLOSE;
-      return;
-    }
+  if ((sem->descriptors).first == 0) {
+     sem = (Semaphore*) List_detach(&semaphores_list, (ListItem*) sem);
+     ret = Semaphore_free(sem);
+     if (ret != 0x0) {
+        // printf("Errore Semaphore_free: %s\n",PoolAllocator_strerror((PoolAllocatorResult) ret));
+         running->syscall_retvalue = DSOS_ESEMCLOSE;
+         return;
+     }
   }
 
   SemDescriptorPtr *sem_des_ptr = sem_des->ptr;
@@ -51,7 +52,8 @@ void internal_semClose() {
     running->syscall_retvalue = DSOS_ESEMCLOSE;
     return;
   }
-
-  running->syscall_retvalue = 0;
-  return;
+  else {
+    running->syscall_retvalue = 0;
+    return;
+  }
 }

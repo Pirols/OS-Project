@@ -9,7 +9,8 @@
 void internal_semWait() {
   int id=running->syscall_args[0];
   
-  SemDescriptor *sem_des = SemDescriptorFind_byID(&(running->sem_descriptors), id);
+  ListHead process_sems = running->sem_descriptors;
+  SemDescriptor *sem_des = SemDescriptorList_byFd(&process_sems, id);
 
   if(!sem_des) {
     running->syscall_retvalue = DSOS_ESEMFDNOTFOUND;
@@ -22,10 +23,8 @@ void internal_semWait() {
     running->syscall_retvalue = DSOS_ESEMWAIT;
     return;
   }
-
-  (sem->count)--;
-
-  if(sem->count < 0) { // Running must wait
+  else if(sem->count <= 0) { // Running must wait
+    (sem->count)--;    
 
     List_insert(&sem->waiting_descriptors, sem->waiting_descriptors.last, (ListItem*)sem_des->ptr_wtr);
 
@@ -34,13 +33,16 @@ void internal_semWait() {
 
     if(ready_list.first) {
       running=(PCB*) List_detach(&ready_list, ready_list.first); 
-      running->status = Running;    
+      running->syscall_retvalue = 0; 
       // Do we need to make a context swap?
     }
-    else running = 0;
+    else {
+      running = 0;
+      running->syscall_retvalue = 0;
+    }
   }
-
-  running->syscall_retvalue = 0;
-  // TO BE CHECKED! I'm actually changing the ret_value of a process which actually didn't start the syscall!!
-
+  else {
+   (sem->count)--;
+   running->syscall_retvalue = 0;
+  }
 }

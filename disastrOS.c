@@ -146,8 +146,8 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
-  SemDescriptor_init();
   Semaphore_init(); //EDITED
+  SemDescriptor_init(); //EDITED
   init_pcb=0;
 
   // populate the vector of syscalls and number of arguments for each syscall
