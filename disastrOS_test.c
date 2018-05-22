@@ -14,7 +14,7 @@ void Producer(void *args);
 void Consumer(void *args);
 
 // we need this to handle the sleep state
-void sleeperFunction(void* args){
+void sleeperFunction(void* args) {
   printf("Hello, I am the sleeper, and I sleep %d\n", disastrOS_getpid());
   while(1) {
     getc(stdin);
@@ -22,7 +22,7 @@ void sleeperFunction(void* args){
   }
 }
 
-void Producer(void* args){
+void Producer(void* args) {
   int i, ret;
 
   printf("[Prod%d]Hello, I'm starting a producer\n", running->pid);
@@ -66,7 +66,7 @@ void Producer(void* args){
   disastrOS_exit(disastrOS_getpid()+1);
 }
 
-void Consumer(void* args){
+void Consumer(void* args) {
 
   int i, ret;
 
@@ -132,7 +132,7 @@ void initFunction(void* args) {
     children++;
   }
 
-  while(children>0 && (pid = disastrOS_wait(0, &retval))>=0){
+  while(children>0 && (pid = disastrOS_wait(0, &retval))>=0) {
     printf("initFunction, child: %d terminated, retval: %d, alive: %d \n", pid, retval, children);
     --children;
   }
@@ -142,7 +142,7 @@ void initFunction(void* args) {
   disastrOS_shutdown();
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
   char* logfilename=0;
   if (argc>1) {
     logfilename=argv[1];
