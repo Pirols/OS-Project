@@ -45,6 +45,14 @@
 #define DSOS_SEMOPEN_LINK 1                 // Tries to link to an existing semaphore, if it doesn't exist returns an error
 #define DSOS_SEMOPEN_LNKCRT 2               // Tries to link to an existing semaphore, if it doesn't exist it creates a new one
 
+// test
+#define SEM_FILL 0
+#define SEM_EMPTY 1
+#define SEM_MUTEX1 2
+#define SEM_MUTEX2 3
+#define BUFFER_LENGTH_SEM 5
+#define ROUNDS 10
+
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32
 #define DSOS_MAX_SYSCALLS_ARGS 8

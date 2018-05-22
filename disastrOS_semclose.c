@@ -20,16 +20,18 @@ void internal_semClose() {
 
   Semaphore *sem = sem_des->semaphore;
 
-  List_detach(&(sem->descriptors), (ListItem *)sem_des->ptr);
+  List_detach(&(sem->descriptors), (ListItem*)sem_des->ptr);
 
-  if ((sem->descriptors).first == 0) {
-     sem = (Semaphore*) List_detach(&semaphores_list, (ListItem*) sem);
-     ret = Semaphore_free(sem);
-     if (ret != 0x0) {
-        // printf("Errore Semaphore_free: %s\n",PoolAllocator_strerror((PoolAllocatorResult) ret));
-         running->syscall_retvalue = DSOS_ESEMCLOSE;
-         return;
-     }
+  if (!(sem->descriptors).size) {
+    sem = (Semaphore*) List_detach(&semaphores_list, (ListItem*) sem);
+    (sem->descriptors).first = 0;
+    (sem->descriptors).last = 0;
+    ret = Semaphore_free(sem);
+    if (ret != 0x0) {
+      printf("Errore Semaphore_free: %s\n",PoolAllocator_strerror((PoolAllocatorResult) ret));
+      running->syscall_retvalue = DSOS_ESEMCLOSE;
+      return;
+    }
   }
 
   SemDescriptorPtr *sem_des_ptr = sem_des->ptr;

@@ -34,7 +34,6 @@ void internal_semWait() {
     if(ready_list.first) {
       running=(PCB*) List_detach(&ready_list, ready_list.first); 
       running->syscall_retvalue = 0; 
-      // Do we need to make a context swap?
     }
     else {
       running = 0;

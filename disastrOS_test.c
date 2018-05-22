@@ -4,13 +4,7 @@
 
 #include "disastrOS.h"
 #include "disastrOS_globals.h"
-
-#define SEM_FILL 0
-#define SEM_EMPTY 1
-#define SEM_MUTEX1 2
-#define SEM_MUTEX2 3
-#define BUFFER_LENGTH_SEM 5
-#define ROUNDS 10
+#include "disastrOS_constants.h"
 
 int read_index, write_index, x;
 int action[BUFFER_LENGTH_SEM];
@@ -34,16 +28,16 @@ void Producer(void* args){
   printf("[Prod %d]Hello, I'm starting a producer with pid: %d\n", running->pid, running->pid);
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
-  //if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("[Prod %d]sem_fill opened with fd: %d\n", disastrOS_getpid(), sem_fill);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Prod %d]sem_fill opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
-  //if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("[Prod %d]sem_empty opened with fd: %d\n", disastrOS_getpid(), sem_empty);
+  if(sem_empty < 0) disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Prod %d]sem_empty opened with fd: %d\n", disastrOS_getpid(), sem_empty);
 
   int sem_mut1 = disastrOS_openSemaphore(SEM_MUTEX1, 1, DSOS_SEMOPEN_LNKCRT);
-  //if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("[Prod %d]sem_mut1 opened with fd: %d\n", disastrOS_getpid(), sem_mut1);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Prod %d]sem_mut1 opened with fd: %d\n", disastrOS_getpid(), sem_mut1);
 
   for(i = 0; i < ROUNDS; i++) {
     disastrOS_waitSemaphore(sem_empty);
@@ -58,16 +52,16 @@ void Producer(void* args){
   } 
 
   ret = disastrOS_closeSemaphore(sem_fill);
-  //if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("sem_fill closed\n");
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_fill closed\n");
 
   ret = disastrOS_closeSemaphore(sem_empty); 
-  //if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("sem_empty closed\n");
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_empty closed\n");
 
   ret = disastrOS_closeSemaphore(sem_mut1);
-  //if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("sem_mut1 closed\n");
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_mut1 closed\n");
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
@@ -79,16 +73,16 @@ void Consumer(void* args){
   printf("[Cons %d]Hello, I'm starting a consumer with pid: %d\n", running->pid, running->pid);
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
-  //if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("[Cons %d]sem_fill opened with fd: %d\n", disastrOS_getpid(), sem_fill);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Cons %d]sem_fill opened with fd: %d\n", disastrOS_getpid(), sem_fill);
 
   int sem_empty = disastrOS_openSemaphore(SEM_EMPTY, BUFFER_LENGTH_SEM, DSOS_SEMOPEN_LNKCRT);
-  //if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("[Cons %d]sem_empty opened with fd: %d\n", disastrOS_getpid(), sem_empty);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Cons %d]sem_empty opened with fd: %d\n", disastrOS_getpid(), sem_empty);
 
   int sem_mut2 = disastrOS_openSemaphore(SEM_MUTEX2, 1, DSOS_SEMOPEN_LNKCRT);
-  //if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("[Cons %d]sem_mut2 opened with fd: %d\n", disastrOS_getpid(), sem_mut2);
+  if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("[Cons %d]sem_mut2 opened with fd: %d\n", disastrOS_getpid(), sem_mut2);
 
   for(i = 0; i < ROUNDS; i++) {
     disastrOS_waitSemaphore(sem_fill);
@@ -107,27 +101,26 @@ void Consumer(void* args){
   } 
 
   ret = disastrOS_closeSemaphore(sem_fill);
-  //if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("sem_fill closed\n");
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_fill closed\n");
 
   ret = disastrOS_closeSemaphore(sem_empty);
-  //if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("sem_empty closed\n");
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_empty closed\n");
 
   ret = disastrOS_closeSemaphore(sem_mut2);
-  //if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  //else printf("sem_mut2 closed\n");
+  if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
+  else printf("sem_mut2 closed\n");
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
 
 
 void initFunction(void* args) {
-  //disastrOS_printStatus();
+  disastrOS_printStatus();
   printf("hello, I am init and I just started pid=%d\n",running->pid);
   disastrOS_spawn(sleeperFunction, 0);
 
-  //inizializzo write index e read read_index
   write_index=0;
   read_index=0;
   printf("I feel like to spawn 10 nice processes\n");
@@ -168,7 +161,7 @@ void initFunction(void* args) {
     disastrOS_destroyResource(i);
   }
 
-  //disastrOS_printStatus();
+  disastrOS_printStatus();
 
   printf("shutdown!\n");
   disastrOS_shutdown();
@@ -188,73 +181,3 @@ int main(int argc, char** argv){
   disastrOS_start(initFunction, 0, logfilename);
   return 0;
 }
-
-/*void initFunction(void* args) {
-  disastrOS_printStatus();
-  printf("hello, I am init and I just started\n");
-  disastrOS_spawn(sleeperFunction, 0);
-
-  printf("I feel like to spawn 10 nice threads\n");
-  
-  int children=0;
-  int fd[10];
-  int i;
-  
-  write_index = 0;
-  read_index = 0;
-
-  for (i=0; i<5; ++i) {
-    int type=0;
-    int mode=DSOS_CREATE;
-    printf("mode: %d\n", mode);
-    printf("opening resource\n");
-    fd[i]=disastrOS_openResource(i,type,mode);
-    printf("fd=%d\n", fd[i]);
-    disastrOS_spawn(Producer, 0);
-    children++;
-}
-
-  for (; i<10; ++i) {
-    int type=0;
-    int mode=DSOS_CREATE;
-    printf("mode: %d\n", mode);
-    printf("opening resource\n");
-    fd[i]=disastrOS_openResource(i,type,mode);
-    printf("fd=%d\n", fd[i]);
-    disastrOS_spawn(Consumer, 0);
-    children++;
-}
-
-  int retval;
-  int pid;
-  while(children>0 && (pid=disastrOS_wait(0, &retval))>=0){
-
-    printf("initFunction, child: %d terminated, retval:%d, alive: %d \n",
-     pid, retval, children);
-    --children;
-}
-
-  for (i=0; i<10; ++i) {
-    printf("closing resource %d\n",fd[i]);
-    disastrOS_closeResource(fd[i]);
-    disastrOS_destroyResource(i);
-}
-
-  disastrOS_printStatus();
-  printf("shutdown!\n");
-  disastrOS_shutdown();
-}
-
-int main(int argc, char** argv){
-  char* logfilename=0;
-  if (argc>1) {
-    logfilename=argv[1];
-  }
-  // we create the init process processes
-  // the first is in the running variable
-  // the others are in the ready queue
-  //printf("the function pointer is: %p", childFunction);
-  // spawn an init process
-  disastrOS_start(initFunction, 0, logfilename);
-  return 0;
-}*/
