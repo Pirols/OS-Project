@@ -25,7 +25,7 @@ void sleeperFunction(void* args) {
 void Producer(void* args) {
   int i, ret;
 
-  printf("[Prod%d]Hello, I'm starting a producer\n", running->pid);
+  printf("\n[Prod%d]Hello, I'm starting a producer\n", running->pid);
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
@@ -37,7 +37,7 @@ void Producer(void* args) {
 
   int sem_mut = disastrOS_openSemaphore(SEM_MUTEX, 1, DSOS_SEMOPEN_LNKCRT);
   if(sem_mut < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("[Prod%d]sem_mut opened with fd: %d\n", running->pid, sem_mut);
+  else printf("[Prod%d]sem_mut opened with fd: %d\n\n", running->pid, sem_mut);
 
   for(i = 0; i < ROUNDS; i++) {
     disastrOS_waitSemaphore(sem_empty);
@@ -53,7 +53,7 @@ void Producer(void* args) {
 
   ret = disastrOS_closeSemaphore(sem_fill);
   if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("[Prod%d]sem_fill closed!\n", running->pid);
+  else printf("\n[Prod%d]sem_fill closed!\n", running->pid);
 
   ret = disastrOS_closeSemaphore(sem_empty); 
   if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
@@ -61,7 +61,7 @@ void Producer(void* args) {
 
   ret = disastrOS_closeSemaphore(sem_mut);
   if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("[Prod%d]sem_mut closed!\n", running->pid);
+  else printf("[Prod%d]sem_mut closed!\n\n", running->pid);
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
@@ -70,7 +70,7 @@ void Consumer(void* args) {
 
   int i, ret;
 
-  printf("[Cons%d]Hello, I'm starting a consumer\n", running->pid);
+  printf("\n[Cons%d]Hello, I'm starting a consumer\n", running->pid);
 
   int sem_fill = disastrOS_openSemaphore(SEM_FILL, 0, DSOS_SEMOPEN_LNKCRT);
   if(sem_fill < 0)  disastrOS_exit(disastrOS_getpid()+1);
@@ -82,7 +82,7 @@ void Consumer(void* args) {
 
   int sem_mut = disastrOS_openSemaphore(SEM_MUTEX, 1, DSOS_SEMOPEN_LNKCRT);
   if(sem_mut < 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("[Cons%d]sem_mut opened with fd: %d\n", running->pid, sem_mut);
+  else printf("[Cons%d]sem_mut opened with fd: %d\n\n", running->pid, sem_mut);
 
   for(i = 0; i < ROUNDS; i++) {
     disastrOS_waitSemaphore(sem_fill);
@@ -93,7 +93,7 @@ void Consumer(void* args) {
     read_index = (read_index + 1) % BUFFER_LENGTH_SEM;
     x += lastAction;
     if (read_index % 10 == 0) {
-      printf("[Cons%d]After the last %d actions balance is now %d.\n", running->pid, ROUNDS, x);
+      printf("[Cons%d]After the last %d actions balance is now %d.\n\n", running->pid, ROUNDS, x);
     }
 
     disastrOS_postSemaphore(sem_mut);
@@ -102,7 +102,7 @@ void Consumer(void* args) {
 
   ret = disastrOS_closeSemaphore(sem_fill);
   if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("[Cons%d]sem_fill closed!\n", running->pid);
+  else printf("\n[Cons%d]sem_fill closed!\n", running->pid);
 
   ret = disastrOS_closeSemaphore(sem_empty); 
   if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
@@ -110,7 +110,7 @@ void Consumer(void* args) {
 
   ret = disastrOS_closeSemaphore(sem_mut);
   if(ret != 0)  disastrOS_exit(disastrOS_getpid()+1);
-  else printf("[Cons%d]sem_mut closed!\n", running->pid);
+  else printf("[Cons%d]sem_mut closed!\n\n", running->pid);
 
   disastrOS_exit(disastrOS_getpid()+1);
 }
@@ -122,12 +122,12 @@ void initFunction(void* args) {
   disastrOS_spawn(sleeperFunction, 0);
 
   int children = 0, i = 0, pid, retval;
-  for (; i < 1; ++i) {
+  for (; i < 2; ++i) {
     disastrOS_spawn(Producer, 0);
     children++;
   }
 
-  for (i = 0; i < 1; ++i) {
+  for (i = 0; i < 2; ++i) {
     disastrOS_spawn(Consumer, 0);
     children++;
   }
