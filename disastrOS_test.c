@@ -40,6 +40,7 @@ void Producer(void* args) {
   else printf("[Prod%d]sem_mut opened with fd: %d\n\n", running->pid, sem_mut);
 
   for(i = 0; i < ROUNDS; i++) {
+    if(!disastrOS_testSemaphore(SEM_EMPTY)) printf("[Prod%d]Going to be blocked.\n", running->pid);
     disastrOS_waitSemaphore(sem_empty);
     disastrOS_waitSemaphore(sem_mut);
 
@@ -85,6 +86,7 @@ void Consumer(void* args) {
   else printf("[Cons%d]sem_mut opened with fd: %d\n\n", running->pid, sem_mut);
 
   for(i = 0; i < ROUNDS; i++) {
+    if(!disastrOS_testSemaphore(SEM_FILL)) printf("[Cons%d]Going to be blocked.\n", running->pid);
     disastrOS_waitSemaphore(sem_fill);
     disastrOS_waitSemaphore(sem_mut);
 

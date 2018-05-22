@@ -34,11 +34,12 @@
 #define DSOS_ESEMCLOSE -15
 #define DSOS_ESEMWAIT -16
 #define DSOS_ESEMPOST -17
-#define DSOS_ESEMFD -18
+#define DSOS_ESEMTEST -18
 #define DSOS_ESEMNOTFOUND -19
 #define DSOS_ESEMALREADYEXIST -20
 #define DSOS_ESEMPTR -21
 #define DSOS_ESEMFDNOTFOUND -22
+#define DSOS_ESEMFD -23
 
 // semaphores 
 #define DSOS_SEMOPEN_CREATE 0               // Tries to create a new semaphore, if the id is already used returns an error
@@ -69,6 +70,7 @@
 #define DSOS_CALL_SEMCLOSE  12
 #define DSOS_CALL_SEMWAIT   13
 #define DSOS_CALL_SEMPOST   14
+#define DSOS_CALL_SEMTEST   15
 
 // resources
 #define DSOS_CREATE 0x1
