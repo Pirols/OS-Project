@@ -118,27 +118,22 @@ void Consumer(void* args){
 
 void initFunction(void* args) {
   disastrOS_printStatus();
-  printf("hello, I am init and I just started pid=%d\n",running->pid);
+
   disastrOS_spawn(sleeperFunction, 0);
 
-  write_index=0;
-  read_index=0;
-  printf("I feel like to spawn 10 nice processes\n");
-  int children=0;
-  int i;
-  int fd[10];
-  for (i=0; i<5; ++i) {
-    int type=0;
-    int mode=DSOS_CREATE;
+  int children = 0, i = 0, fd[10];
+  for (; i < 1; ++i) {
+    int type = 0;
+    int mode = DSOS_CREATE;
     printf("mode: %d\n", mode);
     printf("opening resource\n");
-    fd[i]=disastrOS_openResource(i,type,mode);
-    printf("fd=%d\n", fd[i]);
+    fd[i] = disastrOS_openResource(i, type, mode);
+    printf("fd = %d\n", fd[i]);
     disastrOS_spawn(Producer, 0);
     children++;
   }
 
-  for (; i<10; ++i) {
+  for (i = 0; i < 1; ++i) {
     int type=0;
     int mode=DSOS_CREATE;
     printf("mode: %d\n", mode);
@@ -172,12 +167,7 @@ int main(int argc, char** argv){
   if (argc>1) {
     logfilename=argv[1];
   }
-  // we create the init process processes
-  // the first is in the running variable
-  // the others are in the ready queue
-  // spawn an init process
-
-  printf("start\n");
+  
   disastrOS_start(initFunction, 0, logfilename);
   return 0;
 }

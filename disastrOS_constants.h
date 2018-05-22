@@ -71,7 +71,7 @@
 #define DSOS_CALL_SEMWAIT   13
 #define DSOS_CALL_SEMPOST   14
 
-//resources
+// resources
 #define DSOS_CREATE 0x1
 #define DSOS_READ 0x2
 #define DSOS_WRITE 0x3
