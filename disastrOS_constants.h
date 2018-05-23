@@ -40,6 +40,10 @@
 #define DSOS_ESEMPTR -21
 #define DSOS_ESEMFDNOTFOUND -22
 #define DSOS_ESEMFD -23
+#define DSOS_ESEMCLOSEDESNF -24
+#define DSOS_ESEMFREE -25
+#define DSOS_ESEMDESFREE -26
+#define DSOS_ESEMDESPTRFREE -27
 
 // semaphores 
 #define DSOS_SEMOPEN_CREATE 0               // Tries to create a new semaphore, if the id is already used returns an error

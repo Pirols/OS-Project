@@ -14,7 +14,7 @@ void internal_semClose() {
   
   SemDescriptor *sem_des = SemDescriptorList_byFd(&(running->sem_descriptors), id);
   if(!sem_des) {
-    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    running->syscall_retvalue = DSOS_ESEMCLOSEDESNF;
     return;
   }
 
@@ -29,7 +29,7 @@ void internal_semClose() {
     ret = Semaphore_free(sem);
     if (ret != 0x0) {
       printf("Errore Semaphore_free: %s\n",PoolAllocator_strerror((PoolAllocatorResult) ret));
-      running->syscall_retvalue = DSOS_ESEMCLOSE;
+      running->syscall_retvalue = DSOS_ESEMFREE;
       return;
     }
   }
@@ -39,19 +39,19 @@ void internal_semClose() {
 
   ret = SemDescriptor_free(sem_des);
   if(ret != 0x0) {
-    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    running->syscall_retvalue = DSOS_ESEMDESFREE;
     return;
   }
 
   ret = SemDescriptorPtr_free(sem_des_ptr);
   if(ret != 0x0) {
-    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    running->syscall_retvalue = DSOS_ESEMDESPTRFREE;
     return;
   }
 
   ret = SemDescriptorPtr_free(sem_des_ptr_wtr);
   if(ret != 0x0) {
-    running->syscall_retvalue = DSOS_ESEMCLOSE;
+    running->syscall_retvalue = DSOS_ESEMDESPTRFREE;
     return;
   }
   else {

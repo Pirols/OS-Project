@@ -51,8 +51,13 @@ void internal_semOpen(){
 			List_insert(&semaphores_list, semaphores_list.last, (ListItem*) sem);
 		}
 	}
+	else {
+		prinf("Insert a correct value for semopen mode!\n");
+		running->syscall_retvalue = DSOS_ESEMOPEN;
+		return;
+	}
 	
-	//controllo che non sia già aperto NEL PROCESSO 
+	//check that the semaphore is not already opened in the process
 	ListHead sem_opened_local = running->sem_descriptors;
 	SemDescriptor *check = SemDescriptorFind_byID(&sem_opened_local, id);
 	if(check) {
@@ -69,9 +74,6 @@ void internal_semOpen(){
 			running->syscall_retvalue = DSOS_ESEMFD;
 			return;
 		}
-		
-		//ADD IT TO SEM_DESCRIPTORS LIST
-		//List_insert(&running->sem_descriptors, running->sem_descriptors.last, (ListItem *)sem_des);
 	
 		//ADD IT TO THE SEMAPHORES LIST
 		//if(new_sem) {

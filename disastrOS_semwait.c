@@ -24,7 +24,7 @@ void internal_semWait() {
     return;
   }
   (sem->count)--;
-  if(sem->count < 0) { // Running must wait
+  if(sem->count < 0) { // Running process must wait
 
     List_insert(&sem->waiting_descriptors, sem->waiting_descriptors.last, (ListItem*)sem_des->ptr_wtr);
 
