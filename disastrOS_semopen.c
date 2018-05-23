@@ -52,7 +52,7 @@ void internal_semOpen(){
 		}
 	}
 	else {
-		prinf("Insert a correct value for semopen mode!\n");
+		printf("Insert a correct value for semopen mode!\n");
 		running->syscall_retvalue = DSOS_ESEMOPEN;
 		return;
 	}
