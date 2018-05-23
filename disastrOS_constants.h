@@ -48,8 +48,7 @@
 // test
 #define SEM_FILL 0
 #define SEM_EMPTY 1
-#define SEM_MUTEX1 2
-#define SEM_MUTEX2 3
+#define SEM_MUTEX 2
 #define BUFFER_LENGTH_SEM 5
 #define ROUNDS 10
 
