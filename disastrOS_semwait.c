@@ -23,25 +23,16 @@ void internal_semWait() {
     running->syscall_retvalue = DSOS_ESEMWAIT;
     return;
   }
-  else if(sem->count <= 0) { // Running must wait
-    (sem->count)--;    
+  (sem->count)--;
+  if(sem->count < 0) { // Running must wait
 
     List_insert(&sem->waiting_descriptors, sem->waiting_descriptors.last, (ListItem*)sem_des->ptr_wtr);
 
     running->status = Waiting;
     List_insert(&waiting_list, waiting_list.last, (ListItem *)running);
 
-    if(ready_list.first) {
-      running=(PCB*) List_detach(&ready_list, ready_list.first); 
-      running->syscall_retvalue = 0; 
-    }
-    else {
-      running = 0;
-      running->syscall_retvalue = 0;
-    }
+    running = (ready_list.first)?(PCB*) List_detach(&ready_list, ready_list.first):0;
   }
-  else {
-   (sem->count)--;
-   running->syscall_retvalue = 0;
-  }
+  
+  running->syscall_retvalue = 0;
 }

@@ -41,6 +41,7 @@ int disastrOS_openSemaphore(int id, int value, int mode);
 int disastrOS_closeSemaphore(int id);
 int disastrOS_waitSemaphore(int id);
 int disastrOS_postSemaphore(int id);
+int disastrOS_testSemaphore(int id);
 
 
 // debug function, prints the state of the internal system

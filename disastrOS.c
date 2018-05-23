@@ -146,8 +146,8 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
-  Semaphore_init(); //EDITED
-  SemDescriptor_init(); //EDITED
+  Semaphore_init();
+  SemDescriptor_init();
   init_pcb=0;
 
   // populate the vector of syscalls and number of arguments for each syscall
@@ -186,7 +186,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
 
   // fill these with the syscall handlers
   syscall_vector[DSOS_CALL_SEMOPEN]      = internal_semOpen;
-  syscall_numarg[DSOS_CALL_SEMOPEN]      = 3;//EDITED DEFAULT 1 -> id nel sistema; 2 -> value; 3 -> mode
+  syscall_numarg[DSOS_CALL_SEMOPEN]      = 3;
 
   syscall_vector[DSOS_CALL_SEMCLOSE]      = internal_semClose;
   syscall_numarg[DSOS_CALL_SEMCLOSE]      = 1;
@@ -196,6 +196,9 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
 
   syscall_vector[DSOS_CALL_SEMWAIT]      = internal_semWait;
   syscall_numarg[DSOS_CALL_SEMWAIT]      = 1;
+
+  syscall_vector[DSOS_CALL_SEMTEST]      = internal_semTest;
+  syscall_numarg[DSOS_CALL_SEMTEST]      = 1;
   
   // setup the scheduling lists
   running=0;
@@ -323,6 +326,10 @@ int disastrOS_waitSemaphore(int id) {
 
 int disastrOS_postSemaphore(int id) {
   return disastrOS_syscall(DSOS_CALL_SEMPOST, id);
+}
+
+int disastrOS_testSemaphore(int id) {
+  return disastrOS_syscall(DSOS_CALL_SEMTEST, id);
 }
 
 
